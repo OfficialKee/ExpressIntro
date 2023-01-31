@@ -23,12 +23,26 @@ app.get('/', (req, res) => {
     res.send('Hello World')
 });
 
-app.get('/all-movies', (req, res) => {
-    res.json({
-        success: true,
-        'all-movies': favoriteMovieList
-
+app.get('/all-movies/', (req, res) => {
+    const inputRating = parseInt(req.query.starRating)
+    const filtered = favoriteMovieList.filter(movie => {
+        return movie.starRating > inputRating
     })
+
+    if (inputRating !== undefined) {
+        return res.json({
+           succuss: true,
+           'filtered-movies': filtered
+        })
+    }
+    else if(inputRating === undefined) {
+        return res.json({
+            success: true,
+            'all-movies': favoriteMovieList
+
+        })
+    }
+    
 })
 app.get('/single-movie/:titleToFind', (req, res) => {
     const getMovie = favoriteMovieList.find(movie => {
@@ -59,40 +73,40 @@ app.post('/new-movie', (req, res) => {
 app.put("/update-movie/:titleToUpdate", (req, res) => {
     const foundTitle = req.params.titleToUpdate
 
-    const findMovieTitle = favoriteMovieList.find(movieTitle => {
-        return movieTitle.title === foundTitle
+    const findMovieTitle = favoriteMovieList.find(movie => {
+        return movie.title === foundTitle
     })
-    const findMovieIndex = favoriteMovieList.findIndex(movie=> {
+    const findMovieIndex = favoriteMovieList.findIndex(movie => {
         return movie.title === foundTitle
     })
     if (!findMovieTitle) {
-		res.json({
-			success: false,
-			message: "Could not find Movie in  list"
-		})
-		return
-	}
+        res.json({
+            success: false,
+            message: "Could not find Movie in  list"
+        })
+        return
+    }
 
 
-    const updatedMovie ={}
+    const updatedMovie = {}
 
-    if (req.body.title !== undefined){
-		updatedMovie.title = req.body.title
-	} else {
-		updatedMovie.title = findMovieTitle.title
-	}
+    if (req.body.title !== undefined) {
+        updatedMovie.title = req.body.title
+    } else {
+        updatedMovie.title = findMovieTitle.title
+    }
 
-	if (req.body.starRating !== undefined){
-		updatedMovie.starRating = req.body.starRating
-	} else {
-		updatedMovie.title = findMovieTitle.starRating
-	}
+    if (req.body.starRating !== undefined) {
+        updatedMovie.starRating = req.body.starRating
+    } else {
+        updatedMovie.title = findMovieTitle.starRating
+    }
 
-	if (req.body.isRecommended !== undefined){
-		updatedMovie.isRecommended= req.body.isRecommended
-	} else {
-		updatedMovie.isRecommended = findMovieTitle.isRecommended
-	}
+    if (req.body.isRecommended !== undefined) {
+        updatedMovie.isRecommended = req.body.isRecommended
+    } else {
+        updatedMovie.isRecommended = findMovieTitle.isRecommended
+    }
 
 
     updatedMovie.createdAt = favoriteMovieList[findMovieIndex].createdAt
@@ -100,28 +114,28 @@ app.put("/update-movie/:titleToUpdate", (req, res) => {
 
     favoriteMovieList[findMovieIndex] = updatedMovie
     res.json({
-        success:true,
+        success: true,
         updatedMovie: updatedMovie
-        
+
     })
 })
-app.delete('/delete-movie/:titleToDelete',(req,res)=>{
-    
+app.delete('/delete-movie/:titleToDelete', (req, res) => {
+
     const deleteTitle = req.params.titleToDelete
 
     const deleteMovieTitle = favoriteMovieList.find(movieTitle => {
         return movieTitle.title === deleteTitle
     })
-    const deleteMovieIndex = favoriteMovieList.findIndex(movie=> {
+    const deleteMovieIndex = favoriteMovieList.findIndex(movie => {
         return movie.title === deleteTitle
     })
-     favoriteMovieList = favoriteMovieList.filter(movie =>{
+    favoriteMovieList = favoriteMovieList.filter(movie => {
         return movie.title !== deleteTitle
-     })
-     res.json({
-        success:true,
+    })
+    res.json({
+        success: true,
         newList: favoriteMovieList
-     })
+    })
 
 })
 
